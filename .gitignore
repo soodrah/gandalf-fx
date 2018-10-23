@@ -1,0 +1,17 @@
+#Intellij
+.idea/
+*.iml
+*.iws
+
+#Eclipse
+.classpath
+.project
+.settings/
+
+#Maven
+target/
+logs/
+
+#Others
+out/
+*.csv
