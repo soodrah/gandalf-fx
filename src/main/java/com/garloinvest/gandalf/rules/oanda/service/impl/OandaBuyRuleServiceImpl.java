@@ -23,9 +23,9 @@ public class OandaBuyRuleServiceImpl implements OandaBuyRuleService {
 	@Scheduled(fixedRate=60000)
 	@Override
 	public void buySignalCandlestick() {
-		candle.readCandlestickData("EUR_USD");
-		LOG.info("*********************Testing RULES**************");
-		LOG.info("Time: {}\nThread: {}",LocalDateTime.now(),Thread.currentThread().getName());
+		boolean candleSignal = candle.compareLastTwoCandlestick("EUR_USD");
+		System.out.println("****************Rules Service:\n");
+		System.out.println("****************Candle Signal to BUY is:"+candleSignal+"\n");
 	}
 
 }
