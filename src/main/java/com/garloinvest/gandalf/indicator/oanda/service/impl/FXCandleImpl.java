@@ -22,8 +22,8 @@ public class FXCandleImpl implements FXCandle {
 	@Override
 	public void readCandlestickData(String instrumentName) {
 		Map<String, Map<LocalDateTime, OandaInstrumentCandlestick>> candlestickData = router.readOandaInstrumentCandlestickPerMinute(instrumentName);
-		LOG.info("Testing Connection with Searcher Service and Thread");
-		LOG.info("Time: {}\nCandleStickData: {}\n Thread: {}",LocalDateTime.now(),candlestickData.size(),Thread.currentThread().getName());
+		LOG.info("*******************Testing INDICATOR***************");
+		LOG.info("\nTime: {}\nCandleStickData size: {}\nThread: {}",LocalDateTime.now(),candlestickData.size(),Thread.currentThread().getName());
 	}
 
 }
