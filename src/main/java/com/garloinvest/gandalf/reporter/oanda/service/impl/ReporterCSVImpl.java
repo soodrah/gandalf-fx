@@ -62,8 +62,9 @@ public class ReporterCSVImpl implements ReporterCSV {
 		OutputStream out = null;
 
 		try {
-			out = new FileOutputStream("dateFile.properties");
+			out = new FileOutputStream("configCSV.properties");
 			properties.setProperty("dateFile", localTime);
+			properties.store(out, null);
 		} catch (FileNotFoundException fe) {
 			LOG.error("Error loading to write configCSV file: {}",fe.getMessage());
 			fe.printStackTrace();
@@ -87,7 +88,7 @@ public class ReporterCSVImpl implements ReporterCSV {
 		properties = new Properties();
 		InputStream in = null;
 		try {
-			in = new FileInputStream("dateFile.properties");
+			in = new FileInputStream("configCSV.properties");
 			properties.load(in);
 			return properties.getProperty("dateFile");
 		} catch (FileNotFoundException fe) {
@@ -117,6 +118,7 @@ public class ReporterCSVImpl implements ReporterCSV {
 		try {
 			out = new FileOutputStream("configCSV.properties");
 			properties.setProperty(CVSLINE, String.valueOf(lines));
+			properties.store(out, null);
 		} catch (FileNotFoundException fe) {
 			LOG.error("Error loading to write configCSV file: {}",fe.getMessage());
 			fe.printStackTrace();
@@ -223,6 +225,7 @@ public class ReporterCSVImpl implements ReporterCSV {
 		try {
 			out = new FileOutputStream("configCSV.properties");
 			properties.setProperty(CVSLINE, "0");
+			properties.store(out, null);
 		} catch (FileNotFoundException fe) {
 			LOG.error("Error loading to write configCSV file: {}",fe.getMessage());
 			fe.printStackTrace();

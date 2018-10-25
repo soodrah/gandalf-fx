@@ -1,11 +1,8 @@
 package com.garloinvest.gandalf.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
@@ -26,16 +23,4 @@ public class GandalfFXConfig implements SchedulingConfigurer{
 		
 		taskRegistrar.setTaskScheduler(threadPoolTaskScheduler);
 	}
-
-/*	@Bean(name="readCandlestickData")
-    public TaskExecutor candlePoolTaskExecutor() {
-        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-        threadPoolTaskExecutor.setCorePoolSize(10);
-        threadPoolTaskExecutor.setMaxPoolSize(20);
-        threadPoolTaskExecutor.setQueueCapacity(100);
-        threadPoolTaskExecutor.setThreadNamePrefix("CandlestickData-");
-        threadPoolTaskExecutor.initialize();
-
-        return threadPoolTaskExecutor;
-    }*/
 }
