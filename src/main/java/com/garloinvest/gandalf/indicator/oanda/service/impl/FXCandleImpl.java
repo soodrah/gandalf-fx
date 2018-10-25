@@ -36,27 +36,31 @@ public class FXCandleImpl implements FXCandle {
 				.entrySet()) {
 			TreeMap<LocalDateTime, OandaInstrumentCandlestick> candleMap = (TreeMap<LocalDateTime, OandaInstrumentCandlestick>) entryInstrument
 					.getValue();
-			LocalDateTime lastTime = candleMap.lastKey();
-			LocalDateTime prevTime = lastTime.minusMinutes(1);
+			LocalDateTime currentTime = candleMap.lastKey();
+			LocalDateTime lastTime = currentTime.minusMinutes(1);
+			LocalDateTime prevTime = currentTime.minusMinutes(2);
 			OandaInstrumentCandlestick prevCandle = candleMap.get(prevTime);
 			OandaInstrumentCandlestick lastCandle = candleMap.get(lastTime);
-
-			if (!prevCandle.isComplete()) {
+			OandaInstrumentCandlestick currentCandle = candleMap.get(currentTime);
+			System.out.println("****************Indicator Service:\n");
+			System.out.println("****************PrevTime: "+prevTime.toString()+"\n");
+			System.out.println("****************PrevCandle Open: "+prevCandle.getOpen().toString()+"\n");
+			System.out.println("****************PrevCandle Close: "+prevCandle.getClose().toString()+"\n");
+			System.out.println("****************LastTime: "+lastTime.toString()+"\n");
+			System.out.println("****************LastCandle Open: "+lastCandle.getOpen().toString()+"\n");
+			System.out.println("****************LastCandle Close: "+prevCandle.getClose().toString()+"\n");
+			if (!lastCandle.isComplete()) {
 				break;
 			}
 
 			// Verifying if the prevCandle was up and if the lastCandle is going up respect
 			// the prevCandle
-			if (prevCandle.getOpen().compareTo(prevCandle.getClose()) < 0) {
-				if (lastCandle.getOpen().compareTo(prevCandle.getClose()) >= 0) {
-					System.out.println("****************Indicator Service:\n");
-					System.out.println("****************Time: "+lastTime.toString()+"\n");
-					System.out.println("****************PrevCandle Open:"+prevCandle.getOpen().toString()+"\n");
-					System.out.println("****************PrevCandle Close:"+prevCandle.getClose().toString()+"\n");
-					System.out.println("****************LastCandle Open:"+lastCandle.getOpen().toString()+"\n");
-					System.out.println("****************LastCandle Close:"+prevCandle.getClose().toString()+"\n");
+			if (prevCandle.getOpen().compareTo(prevCandle.getClose()) < 0 && 
+					lastCandle.getOpen().compareTo(prevCandle.getClose()) >= 0 && 
+						lastCandle.getOpen().compareTo(lastCandle.getClose()) <= 0) {
+				
+					System.out.println("****************BUY!!!\n");
 					return true;
-				}
 			}
 		}
 
