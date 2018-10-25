@@ -1,5 +1,6 @@
 package com.garloinvest.gandalf.searcher.oanda.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -51,10 +52,14 @@ public class OandaRouterImpl implements OandaRouter {
 
         try {
             InstrumentCandlesResponse response = context.instrument.candles(request);
-            LOG.info("Response Executed for Instrument -> {} at every -> {}", response.getInstrument(), response.getGranularity().toString());
+            LOG.info("Response Executed for Instrument -> {} at every -> {} Local Time -> {}",response.getInstrument(),
+            		response.getGranularity().toString(),LocalDateTime.now());
             for(Candlestick candlestick: response.getCandles()) {
                 OandaInstrumentCandlestick candlestickNow = new OandaInstrumentCandlestick();
-                candlestickNow.setTime(DateUtil.convertFromOandaDateTimeToJavaLocalDateTime(candlestick.getTime()));
+                if(null != candlestick.getTime()) {
+                	candlestickNow.setTime(DateUtil.convertFromOandaDateTimeToJavaLocalDateTime(candlestick.getTime()));
+                }
+                
                 candlestickNow.setComplete(candlestick.getComplete());
                 candlestickNow.setVolume(candlestick.getVolume());
                 candlestickNow.setOpen(candlestick.getMid().getO().bigDecimalValue());

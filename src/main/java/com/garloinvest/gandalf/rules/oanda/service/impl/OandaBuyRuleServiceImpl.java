@@ -20,12 +20,11 @@ public class OandaBuyRuleServiceImpl implements OandaBuyRuleService {
 	private FXCandle candle;
 
 //	@Async("readCandlestickData")
-	@Scheduled(fixedRate=60000)
+	@Scheduled(cron = "0 * * * * ?")
 	@Override
 	public void buySignalCandlestick() {
 		boolean candleSignal = candle.compareLastTwoCandlestick("EUR_USD");
-		System.out.println("****************Rules Service:\n");
-		System.out.println("****************Candle Signal to BUY is: "+candleSignal+"\n");
+		LOG.info("OandaBuyRuleServiceImpl: {} Time: {}",Thread.currentThread().getName(),LocalDateTime.now());
 	}
 
 }
