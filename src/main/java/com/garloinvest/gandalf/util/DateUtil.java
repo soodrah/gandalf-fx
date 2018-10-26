@@ -15,6 +15,7 @@ public class DateUtil {
     }
 
 	public static String formatDateToCsvFile(String localTime) {
-		return StringUtils.replace(localTime.toString(),":","-").toString();
+		StringBuilder date = new StringBuilder(StringUtils.replace(localTime,".","-"));
+		return StringUtils.replace(date.toString(),":","-").toString();
 	}
 }

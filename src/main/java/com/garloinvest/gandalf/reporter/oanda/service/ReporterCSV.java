@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public interface ReporterCSV {
 
-	public void savedCandleStickBUYSignal(String localTime, String prevTime, BigDecimal bigDecimal, 
-			BigDecimal bigDecimal2, String lastTime, BigDecimal bigDecimal3, BigDecimal bigDecimal4);
+	public void savedCandleStickBUYSignal(String prevTime, BigDecimal prevOpen, 
+			BigDecimal prevClose, String lastTime, BigDecimal lastOpen, BigDecimal lastClose);
 	
 }
