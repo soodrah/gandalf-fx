@@ -2,11 +2,9 @@ package com.garloinvest.gandalf.reporter.oanda.service.impl;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,11 +26,14 @@ public class ReporterCSVImpl implements ReporterCSV {
 	private static final String DELIMITER = ",";
 	private static final String NEW_LINE = "\n";
 	private static final String HEADER = "ID,LocalTime,PrevTime,PrevOpen,PrevClose,PrevSize,LastTime,LastOpen,LastClose,LastSize";
-	private static final String CVSLINE = "csvLines";
-	private static final String DATEFILE = "dateFile";
+	private static final String CVSLINEB = "csvLines";
+	private static final String DATEFILEB = "dateFile";
+	private static final String IDBUY = "idBuy";
+	private static final String IDREJECT = "idRejected";
+	private static final String CVSLINER = "csvLineReject";
+	private static final String DATEFILER = "dateFileReject";
 	private static final String CONFIG_CSV_FILE = "configCSV.properties";
 	private Properties properties;
-	private int id = 0;
 
 	@Override
 	public void savedCandleStickBUYSignal(String prevTime, BigDecimal prevOpen, BigDecimal prevClose,
@@ -45,35 +46,70 @@ public class ReporterCSVImpl implements ReporterCSV {
 		int lOpen = lastOpen.multiply(BigDecimal.valueOf(100000)).intValue();
 		int lClose = lastClose.multiply(BigDecimal.valueOf(100000)).intValue();
 		int lastSize = lClose - lOpen;
-		id++;
+		int id = readCount(IDBUY);
+		increaseCount(IDBUY, id);
 
-		int lines = readLines();
+		int lines = readCount(CVSLINEB);
 		if (lines == 0) {
-			increaseLines(lines);
-			savedDateFile(localTime);
-			appendToNewFile(id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen, lastClose,
+			increaseCount(CVSLINEB,lines);
+			savedDateFile(DATEFILEB,localTime);
+			appendToNewFile("TRADE-BUY",id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen, lastClose,
 					lastSize);
 		} else if (lines > 100) {
 			resetLines();
-			savedDateFile(localTime);
-			appendToNewFile(id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen, lastClose,
+			savedDateFile(DATEFILEB,localTime);
+			appendToNewFile("TRADE-BUY",id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen, lastClose,
 					lastSize);
 		}else {
-			increaseLines(lines);
-			String currentDateFile = readDateFile();
-			appendToExistingFile(id, currentDateFile, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen,
+			increaseCount(CVSLINEB,lines);
+			String currentDateFile = readDateFile(DATEFILEB);
+			appendToExistingFile("TRADE-BUY",currentDateFile,id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen,
 				lastClose, lastSize);
 		}
 		
 
 	}
+	
+	@Override
+	public void storeRejectCandleData(String prevTime, BigDecimal prevOpen, BigDecimal prevClose, String lastTime,
+			BigDecimal lastOpen, BigDecimal lastClose) {
+		
+		String localTime = LocalDateTime.now().toString();
+		int pOpen = prevOpen.multiply(BigDecimal.valueOf(100000)).intValue();
+		int pClose = prevClose.multiply(BigDecimal.valueOf(100000)).intValue();
+		int prevSize = pClose - pOpen;
+		int lOpen = lastOpen.multiply(BigDecimal.valueOf(100000)).intValue();
+		int lClose = lastClose.multiply(BigDecimal.valueOf(100000)).intValue();
+		int lastSize = lClose - lOpen;
+		int id = readCount(IDREJECT);
+		increaseCount(IDREJECT, id);
 
-	private void appendToNewFile(int idF, String localTime, String prevTime, BigDecimal prevOpen, BigDecimal prevClose,
+		int lines = readCount(CVSLINER);
+		if (lines == 0) {
+			increaseCount(CVSLINER,lines);
+			savedDateFile(DATEFILER,localTime);
+			appendToNewFile("TRADE-REJECT",id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen, lastClose,
+					lastSize);
+		} else if (lines > 100) {
+			resetLines();
+			savedDateFile(DATEFILER,localTime);
+			appendToNewFile("TRADE-REJECT",id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen, lastClose,
+					lastSize);
+		}else {
+			increaseCount(CVSLINER,lines);
+			String currentDateFile = readDateFile(DATEFILER);
+			appendToExistingFile("TRADE-REJECT",currentDateFile,id, localTime, prevTime, prevOpen, prevClose, prevSize, lastTime, lastOpen,
+				lastClose, lastSize);
+		}
+		
+	}
+
+	private void appendToNewFile(String fileName, int idF, String localTime, String prevTime, BigDecimal prevOpen, BigDecimal prevClose,
 			int prevSize, String lastTime, BigDecimal lastOpen, BigDecimal lastClose, int lastSize) {
 		PrintWriter printWriter = null;
 		try {
 			String time = DateUtil.formatDateToCsvFile(localTime);
-			printWriter = new PrintWriter(new FileWriter("Trade" + time + ".csv"));
+			printWriter = new PrintWriter(new FileWriter(fileName + time + ".csv"));
 			StringBuilder sb = new StringBuilder();
 			sb.append(HEADER);
 			sb.append(NEW_LINE);
@@ -106,17 +142,17 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 	}
 
-	private void appendToExistingFile(int idF, String currentDateFile, String prevTime, BigDecimal prevOpen,
+	private void appendToExistingFile(String fileName, String currentDateFile, int idF, String localTime, String prevTime, BigDecimal prevOpen,
 			BigDecimal prevClose, int prevSize, String lastTime, BigDecimal lastOpen, BigDecimal lastClose,
 			int lastSize) {
 		String time = DateUtil.formatDateToCsvFile(currentDateFile);
 		FileWriter fileWriter = null;
 		try {
-			fileWriter = new FileWriter("Trade" + time + ".csv", true);
+			fileWriter = new FileWriter(fileName + time + ".csv", true);
 			fileWriter.append(NEW_LINE);
 			fileWriter.append(String.valueOf(idF)); // ID
 			fileWriter.append(DELIMITER);
-			fileWriter.append(currentDateFile); // EST Time
+			fileWriter.append(localTime); // EST Time
 			fileWriter.append(DELIMITER);
 			fileWriter.append(prevTime); // PrevTime UTC
 			fileWriter.append(DELIMITER);
@@ -150,38 +186,12 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 
 	}
-
-	/*private void resetLines() {
-		properties = new Properties();
-		OutputStream out = null;
-
-		try {
-			out = new FileOutputStream("configCSV.properties");
-			properties.setProperty(CVSLINE, "0");
-			properties.store(out, null);
-		} catch (FileNotFoundException fe) {
-			LOG.error("Error loading to write configCSV file: {}", fe.getMessage());
-			fe.printStackTrace();
-		} catch (IOException ie) {
-			LOG.error("Error loading configCSV file: {}", ie.getMessage());
-			ie.printStackTrace();
-		} finally {
-			if (null != out) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					LOG.error("Error closing configCSV file: {}", e.getMessage());
-					e.printStackTrace();
-				}
-			}
-		}
-	}*/
 	
 	private void resetLines() {
 		PropertiesConfiguration props = null;
 		try {
 			props = new PropertiesConfiguration(CONFIG_CSV_FILE);
-			props.setProperty(CVSLINE, "0");
+			props.setProperty(CVSLINEB, "0");
 			props.save();
 		} catch (ConfigurationException ce) {
 			LOG.error("Error loading to write configCSV file: {}", ce.getMessage());
@@ -189,13 +199,13 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 	}
 
-	private int readLines() {
+	private int readCount(String key) {
 		properties = new Properties();
 		InputStream in = null;
 		try {
 			in = new FileInputStream(CONFIG_CSV_FILE);
 			properties.load(in);
-			return Integer.parseInt(properties.getProperty(CVSLINE));
+			return Integer.parseInt(properties.getProperty(key));
 		} catch (FileNotFoundException fe) {
 			LOG.error("Error reading configCSV file: {}", fe.getMessage());
 			fe.printStackTrace();
@@ -214,38 +224,12 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 		return 0;
 	}
-
-	/*private void savedDateFile(String localTime) {
-		properties = new Properties();
-		OutputStream out = null;
-
-		try {
-			out = new FileOutputStream("configCSV.properties");
-			properties.setProperty(DATEFILE, localTime);
-			properties.store(out, null);
-		} catch (FileNotFoundException fe) {
-			LOG.error("Error loading to write configCSV file: {}", fe.getMessage());
-			fe.printStackTrace();
-		} catch (IOException ie) {
-			LOG.error("Error loading configCSV file: {}", ie.getMessage());
-			ie.printStackTrace();
-		} finally {
-			if (null != out) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					LOG.error("Error closing configCSV file: {}", e.getMessage());
-					e.printStackTrace();
-				}
-			}
-		}
-	}*/
 	
-	private void savedDateFile(String localTime) {
+	private void savedDateFile(String key, String localTime) {
 		PropertiesConfiguration props = null;
 		try {
 			props = new PropertiesConfiguration(CONFIG_CSV_FILE);
-			props.setProperty(DATEFILE, localTime);
+			props.setProperty(key, localTime);
 			props.save();
 		} catch (ConfigurationException ce) {
 			LOG.error("Error loading to write configCSV file: {}", ce.getMessage());
@@ -253,13 +237,13 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 	}
 
-	private String readDateFile() {
+	private String readDateFile(String key) {
 		properties = new Properties();
 		InputStream in = null;
 		try {
 			in = new FileInputStream(CONFIG_CSV_FILE);
 			properties.load(in);
-			return properties.getProperty(DATEFILE);
+			return properties.getProperty(key);
 		} catch (FileNotFoundException fe) {
 			LOG.error("Error reading configCSV file: {}", fe.getMessage());
 			fe.printStackTrace();
@@ -278,39 +262,13 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 		return null;
 	}
-
-	/*private void increaseLines(int lines) {
-		properties = new Properties();
-		OutputStream out = null;
-		lines++;
-
-		try {
-			out = new FileOutputStream("configCSV.properties");
-			properties.setProperty(CVSLINE, String.valueOf(lines));
-			properties.store(out, null);
-		} catch (FileNotFoundException fe) {
-			LOG.error("Error loading to write configCSV file: {}", fe.getMessage());
-			fe.printStackTrace();
-		} catch (IOException ie) {
-			LOG.error("Error loading configCSV file: {}", ie.getMessage());
-			ie.printStackTrace();
-		} finally {
-			if (null != out) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					LOG.error("Error closing configCSV file: {}", e.getMessage());
-					e.printStackTrace();
-				}
-			}
-		}
-	}*/
-	private void increaseLines(int lines) {
+	
+	private void increaseCount(String key, int value) {
 		PropertiesConfiguration props = null;
-		lines++;
+		value++;
 		try {
 			props = new PropertiesConfiguration(CONFIG_CSV_FILE);
-			props.setProperty(CVSLINE, String.valueOf(lines));
+			props.setProperty(key, String.valueOf(value));
 			props.save();
 		} catch (ConfigurationException ce) {
 			LOG.error("Error loading to write configCSV file: {}", ce.getMessage());

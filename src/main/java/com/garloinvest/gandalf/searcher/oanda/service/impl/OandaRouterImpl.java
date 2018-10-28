@@ -56,25 +56,41 @@ public class OandaRouterImpl implements OandaRouter {
             		response.getGranularity().toString(),LocalDateTime.now());
             for(Candlestick candlestick: response.getCandles()) {
                 OandaInstrumentCandlestick candlestickNow = new OandaInstrumentCandlestick();
+                candlestickNow.setComplete(candlestick.getComplete());
                 if(null != candlestick.getTime()) {
                 	candlestickNow.setTime(DateUtil.convertFromOandaDateTimeToJavaLocalDateTime(candlestick.getTime()));
                 }
-                
-                candlestickNow.setComplete(candlestick.getComplete());
-                candlestickNow.setVolume(candlestick.getVolume());
-                candlestickNow.setOpen(candlestick.getMid().getO().bigDecimalValue());
-                candlestickNow.setClose(candlestick.getMid().getC().bigDecimalValue());
-                candlestickNow.setHigh(candlestick.getMid().getH().bigDecimalValue());
-                candlestickNow.setLow(candlestick.getMid().getL().bigDecimalValue());
-
+                if(null != candlestick.getVolume()) {
+                	candlestickNow.setVolume(candlestick.getVolume());
+                }
+                if(null != candlestick.getMid().getO().bigDecimalValue()) {
+                	candlestickNow.setOpen(candlestick.getMid().getO().bigDecimalValue());
+                }else {
+                	continue;
+                }
+                if(null != candlestick.getMid().getC().bigDecimalValue()) {
+                	candlestickNow.setClose(candlestick.getMid().getC().bigDecimalValue());
+                }else {
+                	continue;
+                }
+                if(null != candlestick.getMid().getH().bigDecimalValue()) {
+                	candlestickNow.setHigh(candlestick.getMid().getH().bigDecimalValue());
+                }else {
+                	continue;
+                }
+                if(null != candlestick.getMid().getL().bigDecimalValue()) {
+                	candlestickNow.setLow(candlestick.getMid().getL().bigDecimalValue());
+                }else {
+                	continue;
+                }
                 candlestickMap.put(candlestickNow.getTime(),candlestickNow);
                 instrument_candle_map.put(response.getInstrument().toString(),candlestickMap);
             }
         } catch (RequestException e) {
-            // TODO Auto-generated catch block
+        	LOG.error("Error OandaRouterImpl Request: {}",e.getErrorMessage());
             e.printStackTrace();
         } catch (ExecuteException e) {
-            // TODO Auto-generated catch block
+        	LOG.error("Error OandaRouterImpl Execution: {}",e.getMessage());
             e.printStackTrace();
         }
         return instrument_candle_map;

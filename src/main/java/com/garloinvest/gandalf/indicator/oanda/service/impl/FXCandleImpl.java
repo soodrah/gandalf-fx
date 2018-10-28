@@ -47,10 +47,6 @@ public class FXCandleImpl implements FXCandle {
 			OandaInstrumentCandlestick currentCandle = candleMap.get(currentTime);
 			System.out.println("****************Indicator Service:\n");
 			System.out.println("****************PrevTime: "+prevTime.toString()+"\n");
-			if(null == prevCandle.getOpen().toString() && null == prevCandle.getClose().toString() 
-					&& null == lastCandle.getOpen().toString() && null == prevCandle.getClose().toString()) {
-				return false;
-			}
 			System.out.println("****************PrevCandle Open: "+prevCandle.getOpen().toString()+"\n");
 			System.out.println("****************PrevCandle Close: "+prevCandle.getClose().toString()+"\n");
 			System.out.println("****************LastTime: "+lastTime.toString()+"\n");
@@ -63,12 +59,14 @@ public class FXCandleImpl implements FXCandle {
 			// Verifying if the prevCandle was up and if the lastCandle is going up respect
 			// the prevCandle
 			if (prevCandle.getOpen().compareTo(prevCandle.getClose()) < 0 && 
-					lastCandle.getOpen().compareTo(prevCandle.getClose()) >= 0 && 
-						lastCandle.getOpen().compareTo(lastCandle.getClose()) <= 0) {
+					lastCandle.getOpen().compareTo(lastCandle.getClose()) <= 0) {
 					System.out.println("****************BUY!!!\n");
 					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),
 							prevCandle.getClose(),lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose());
 					return true;
+			}else {
+				reporterCSV.storeRejectCandleData(prevTime.toString(),prevCandle.getOpen(),
+						prevCandle.getClose(),lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose());
 			}
 		}
 

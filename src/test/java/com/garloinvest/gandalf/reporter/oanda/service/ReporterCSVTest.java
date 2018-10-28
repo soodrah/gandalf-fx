@@ -42,10 +42,10 @@ public class ReporterCSVTest {
 	
 	@Test
 	public void testReadAndIncreaseLineFromConfigFile() throws InterruptedException {
-		for(int i = 0; i < 1000; i++) {
+		/*for(int i = 0; i < 1000; i++) {
 			reporter.savedCandleStickBUYSignal(prevTime, prevOpen, prevClose, lastTime, lastOpen, lastClose);
 			Thread.sleep(1000);
-		}	
+		}*/	
 	}
 	
 }
