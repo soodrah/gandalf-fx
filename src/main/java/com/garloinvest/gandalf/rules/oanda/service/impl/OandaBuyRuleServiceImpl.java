@@ -18,11 +18,10 @@ public class OandaBuyRuleServiceImpl implements OandaBuyRuleService {
 	@Autowired
 	private FXCandle candle;
 
-	@Scheduled(cron = "0 * * * * ?")
 	@Override
-	public void buySignalCandlestick() {
-		boolean candleSignal = candle.compareLastTwoCandlestick("EUR_USD");
+	public boolean buySignalCandlestick() {
 		LOG.info("OandaBuyRuleServiceImpl: {} Time: {}",Thread.currentThread().getName(),LocalDateTime.now());
+		return candle.compareLastTwoCandlestick("EUR_USD");
 	}
 
 }
