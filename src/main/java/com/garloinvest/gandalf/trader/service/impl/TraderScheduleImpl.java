@@ -20,7 +20,7 @@ public class TraderScheduleImpl implements TraderSchedule {
 	private OandaBuyRuleService rules;
 	
 	@Override
-	@Scheduled(fixedRate=1000)
+//	@Scheduled(fixedRate=1000)
 	public boolean onOff() {
 		
 		String dayOfWeek = LocalDateTime.now().getDayOfWeek().toString();
@@ -65,9 +65,14 @@ public class TraderScheduleImpl implements TraderSchedule {
 	}
 	
 	@Override
-	@Scheduled(cron = "0 * * * * ?")
 	public boolean buyerSignalPerMinute() {
+		//TODO: call all the signals for BUY
+		//i.e candlestick, price
 		boolean rulesCandlestick = rules.buySignalCandlestick();
+		if(rulesCandlestick) {
+			LOG.info("*******  A BUY signal from Rules Candelstick  ******");
+			return true;
+		}
 		return false;
 	}
 
