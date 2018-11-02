@@ -37,11 +37,12 @@ public class TraderScheduleImpl implements TraderSchedule {
 				return false;
 			}
 			
-		}else if(GlobalConstants.SHUTDOWN_DAY.equalsIgnoreCase(dayOfWeek) && GlobalConstants.SHUTDOWN_HOUR == hour
-				&& GlobalConstants.SHUTDOWN_MINUT >= minute) {
-			LOG.info("*******  GANDALF-FX SHUTDOWN  *******");
-			LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour,minute);
-			return false;
+		}else if(GlobalConstants.SHUTDOWN_DAY.equalsIgnoreCase(dayOfWeek)) {
+				if(GlobalConstants.SHUTDOWN_HOUR <= hour && GlobalConstants.SHUTDOWN_MINUT <= minute) {
+					LOG.info("*******  GANDALF-FX SHUTDOWN  *******");
+					LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour,minute);
+					return false;
+				}
 		}else if (GlobalConstants.OFF_DAY.equalsIgnoreCase(dayOfWeek)) {
 			return false;
 		}
@@ -56,7 +57,7 @@ public class TraderScheduleImpl implements TraderSchedule {
 		int minute = LocalDateTime.now().getMinute();
 		
 		if(GlobalConstants.SHUTDOWN_DAY.equalsIgnoreCase(dayOfWeek) && GlobalConstants.CLOSE_TRADE_HOUR == hour
-				&& GlobalConstants.CLOSE_TRADE_MINUT >= minute) {
+				&& GlobalConstants.CLOSE_TRADE_MINUT <= minute) {
 			LOG.info("*******  GANDALF-FX SHUTDOWN  *******");
 			LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour,minute);
 			return true;
