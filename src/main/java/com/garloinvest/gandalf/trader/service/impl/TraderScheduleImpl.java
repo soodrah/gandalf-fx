@@ -70,6 +70,7 @@ public class TraderScheduleImpl implements TraderSchedule {
 		//TODO: call all the signals for BUY
 		//i.e candlestick, price
 		boolean rulesCandlestick = rules.buySignalCandlestick();
+		//TODO: read signal buy from Price
 		if(rulesCandlestick) {
 			LOG.info("*******  A BUY signal from Rules Candelstick  ******");
 			return true;

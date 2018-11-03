@@ -47,62 +47,16 @@ public class FXCandleImpl implements FXCandle {
 			OandaInstrumentCandlestick lastCandle = candleMap.get(lastTime);
 			OandaInstrumentCandlestick currentCandle = candleMap.get(currentTime);
 			System.out.println("****************Indicator Service:\n");
-			//TODO: Important handle null values
-			if(null != prevTime) {
-				System.out.println("****************PrevTime: "+prevTime.toString()+"\n");
-			}else {
-				System.out.println("****************PrevTime: NULL");
-				break;
-			}
-			if(null != prevCandle.getOpen()) {
-				System.out.println("****************PrevCandle Open: "+prevCandle.getOpen().toString()+"\n");
-			}else {
-				System.out.println("****************PrevCandle Open: NULL");
-				break;
-			}
-			if(null != prevCandle.getClose()) {
-				System.out.println("****************PrevCandle Close: "+prevCandle.getClose().toString()+"\n");
-			}else {
-				System.out.println("****************PrevCandle Close: NULL");
-				break;
-			}
-			if(null != lastTime) {
-				System.out.println("****************LastTime: "+lastTime.toString()+"\n");
-			}else {
-				System.out.println("****************LastTime: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen()) {
-				System.out.println("****************LastCandle Open: "+lastCandle.getOpen().toString()+"\n");
-			}else {
-				System.out.println("****************LastCandle Open: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen()) {
-				System.out.println("****************LastCandle Close: "+lastCandle.getClose().toString()+"\n");
-			}else {
-				System.out.println("****************LastCandle Close: NULL");
-				break;
-			}
-			if(null != lastTime) {
-				System.out.println("****************CurrentTime: "+currentTime.toString()+"\n");
-			}else {
-				System.out.println("****************CurrentTime: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen()) {
-				System.out.println("****************CurrentCandle Open: "+currentCandle.getOpen().toString()+"\n");
-			}else {
-				System.out.println("****************CurrentCandle Open: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen()) {
-				System.out.println("****************CurrentCandle Close: "+currentCandle.getClose().toString()+"\n");
-			}else {
-				System.out.println("****************CurrentCandle Close: NULL");
-				break;
-			}
-			
+			System.out.println("****************PrevTime: "+prevTime.toString()+"\n");
+			System.out.println("****************PrevCandle Open: "+prevCandle.getOpen().toString()+"\n");
+			System.out.println("****************PrevCandle Close: "+prevCandle.getClose().toString()+"\n");
+			System.out.println("****************LastTime: "+lastTime.toString()+"\n");
+			System.out.println("****************LastCandle Open: "+lastCandle.getOpen().toString()+"\n");
+			System.out.println("****************LastCandle Close: "+lastCandle.getClose().toString()+"\n");
+			System.out.println("****************CurrentTime: "+currentTime.toString()+"\n");
+			System.out.println("****************CurrentCandle Open: "+currentCandle.getOpen().toString()+"\n");
+			System.out.println("****************CurrentCandle Close: "+currentCandle.getClose().toString()+"\n");
+
 			if (!lastCandle.isComplete()) {
 				break;
 			}
@@ -119,7 +73,7 @@ public class FXCandleImpl implements FXCandle {
 			int cOpen = currentCandle.getOpen().multiply(BigDecimal.valueOf(100000)).intValue();  //currentOpen	
 			int cClose = currentCandle.getClose().multiply(BigDecimal.valueOf(100000)).intValue();//currentClose
 			int currentSize = cClose - cOpen;
-			if (prevSize >= 0 && lastSize >= 0 && currentSize >= 0) { //Rule no.4
+			if (prevSize >= 0 && lastSize >= 0 && currentSize >= 0) { //Rule no.1
 					System.out.println("****************BUY!!!\n");
 					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
@@ -134,7 +88,7 @@ public class FXCandleImpl implements FXCandle {
 					return true;
 				}
 			}else if(lastSize < 0) {
-				if(currentSize > - lastSize || (prevSize + currentSize) > - lastSize) { //Rule no.1
+				if(currentSize > - lastSize || (prevSize + currentSize) > - lastSize) { //Rule no.3
 					System.out.println("****************BUY!!!\n");
 					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),

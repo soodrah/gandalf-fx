@@ -18,17 +18,21 @@ public class TraderOperationImpl implements TraderOperation {
 	private TraderSchedule schedule;
 	@Autowired
 	private OandaBuyRuleService rule;
-	
+
 	@Override
-	@Scheduled(cron = "0 * * * * ?")
+	@Scheduled(cron = "0/1 * * * * ?")
 	public void startOp() {
-		if(schedule.onOff()) {
-			if(schedule.closeTrade()) {
-				//TODO: Close any open position at the best price
-			}else if(rule.isAnyOpenPosition()){
-				//TODO: Checked for any open position, and if any run the watch-list
-			}else if(schedule.buyerSignalPerMinute()) {
-				//TODO: Execute a place Order
+		
+		if (true) { // if(schedule.onOff())
+			if (schedule.closeTrade()) {
+				LOG.info("*******  Closing Positions  ********");
+				if (rule.isAnyOpenPosition()) {
+					// TODO: Close any open position at the best price
+				}
+			} else if (rule.isAnyOpenPosition()) {
+				// TODO: Checked for any open position, and if any run the watch-list
+			} else if (schedule.buyerSignalPerMinute()) {
+				// TODO: Execute a place Order
 				LOG.info("*******  Executed Place BUY Order  *******");
 			}
 		}
