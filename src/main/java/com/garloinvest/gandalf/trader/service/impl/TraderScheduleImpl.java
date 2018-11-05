@@ -25,12 +25,11 @@ public class TraderScheduleImpl implements TraderSchedule {
 		
 		String dayOfWeek = LocalDateTime.now().getDayOfWeek().toString();
 		int hour = LocalDateTime.now().getHour();
-		int minute = LocalDateTime.now().getMinute();
 		
 		if(GlobalConstants.START_DAY.equalsIgnoreCase(dayOfWeek)) {
-			if(GlobalConstants.START_HOUR == hour && GlobalConstants.START_MINUT <= minute) {
+			if(GlobalConstants.START_HOUR <= hour) {
 				LOG.info("*******  GANDALF-FX STARTED  *******");
-				LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour,minute);
+				LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour);
 				return true;
 			}else {
 				LOG.info("It is : {}, but cannot start yet",dayOfWeek);
@@ -38,15 +37,15 @@ public class TraderScheduleImpl implements TraderSchedule {
 			}
 			
 		}else if(GlobalConstants.SHUTDOWN_DAY.equalsIgnoreCase(dayOfWeek)) {
-				if(GlobalConstants.SHUTDOWN_HOUR <= hour && GlobalConstants.SHUTDOWN_MINUT <= minute) {
+				if(GlobalConstants.SHUTDOWN_HOUR <= hour) {
 					LOG.info("*******  GANDALF-FX SHUTDOWN  *******");
-					LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour,minute);
+					LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour);
 					return false;
 				}
 		}else if (GlobalConstants.OFF_DAY.equalsIgnoreCase(dayOfWeek)) {
 			return false;
 		}
-		LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour,minute);
+		LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour);
 		return true;
 	}
 
@@ -54,12 +53,10 @@ public class TraderScheduleImpl implements TraderSchedule {
 	public boolean closeTrade() {
 		String dayOfWeek = LocalDateTime.now().getDayOfWeek().toString();
 		int hour = LocalDateTime.now().getHour();
-		int minute = LocalDateTime.now().getMinute();
 		
-		if(GlobalConstants.SHUTDOWN_DAY.equalsIgnoreCase(dayOfWeek) && GlobalConstants.CLOSE_TRADE_HOUR == hour
-				&& GlobalConstants.CLOSE_TRADE_MINUT <= minute) {
+		if(GlobalConstants.SHUTDOWN_DAY.equalsIgnoreCase(dayOfWeek) && GlobalConstants.CLOSE_TRADE_HOUR == hour) {
 			LOG.info("*******  GANDALF-FX SHUTDOWN  *******");
-			LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour,minute);
+			LOG.info("\nDay: {}\nHour: {}\nMinute: {}",dayOfWeek,hour);
 			return true;
 		}
 		return false;

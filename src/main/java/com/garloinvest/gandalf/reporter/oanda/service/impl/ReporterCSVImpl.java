@@ -25,7 +25,7 @@ public class ReporterCSVImpl implements ReporterCSV {
 
 	private static final String DELIMITER = ",";
 	private static final String NEW_LINE = "\n";
-	private static final String HEADER = "ID,LocalTime,PrevTime,PrevOpen,PrevClose,PrevSize,LastTime,LastOpen,LastClose,LastSize,CurrentTime,CurrentOpen,CurrentClose,CurrentSize,";
+	private static final String HEADER = "ID,LocalTime,PrevTime,PrevOpen,PrevClose,PrevSize,LastTime,LastOpen,LastClose,LastSize,CurrentTime,CurrentOpen,CurrentClose,CurrentSize,Rule";
 	private static final String CSVLINEB = "csvLines";
 	private static final String DATEFILEB = "dateFile";
 	private static final String IDBUY = "idBuy";
@@ -33,11 +33,14 @@ public class ReporterCSVImpl implements ReporterCSV {
 	private static final String CSVLINER = "csvLineReject";
 	private static final String DATEFILER = "dateFileReject";
 	private static final String CONFIG_CSV_FILE = "configCSV.properties";
+	private static final String RULE_1 = "Rule1";
+	private static final String RULE_2 = "Rule2";
+	private static final String RULE_3 = "Rule3";
 	private Properties properties;
 
 	@Override
 	public void savedCandleStickBUYSignal(String prevTime, BigDecimal prevOpen, BigDecimal prevClose,
-			String lastTime, BigDecimal lastOpen, BigDecimal lastClose,String currentTime, BigDecimal currentOpen, BigDecimal currentClose) {
+			String lastTime, BigDecimal lastOpen, BigDecimal lastClose,String currentTime, BigDecimal currentOpen, BigDecimal currentClose, String rule) {
 
 		String localTime = LocalDateTime.now().toString();
 		int pOpen = prevOpen.multiply(BigDecimal.valueOf(100000)).intValue();	 //prevOpen
@@ -51,6 +54,10 @@ public class ReporterCSVImpl implements ReporterCSV {
 		int currentSize = cClose - cOpen;
 		int id = readCount(IDBUY);
 		increaseCount(IDBUY, id);
+		
+		String ruleNo = checkedRule(rule);
+		int amount = readCount(ruleNo);
+		increaseCount(ruleNo, amount);
 
 		int lines = readCount(CSVLINEB);
 		if (lines == 0) {
@@ -58,27 +65,28 @@ public class ReporterCSVImpl implements ReporterCSV {
 			savedDateFile(DATEFILEB,localTime);
 			appendToNewFile("TRADE-BUY",id, localTime, prevTime, prevOpen, prevClose, prevSize, 
 					lastTime, lastOpen, lastClose,lastSize,
-					currentTime,currentOpen,currentClose,currentSize);
+					currentTime,currentOpen,currentClose,currentSize, ruleNo);
 		} else if (lines > 100) {
 			resetLines(CSVLINEB);
 			savedDateFile(DATEFILEB,localTime);
 			appendToNewFile("TRADE-BUY",id, localTime, prevTime, prevOpen, prevClose, prevSize, 
 					lastTime, lastOpen, lastClose, lastSize,
-					currentTime,currentOpen,currentClose,currentSize);
+					currentTime,currentOpen,currentClose,currentSize, ruleNo);
 		}else {
 			increaseCount(CSVLINEB,lines);
 			String currentDateFile = readDateFile(DATEFILEB);
 			appendToExistingFile("TRADE-BUY",currentDateFile,id, localTime, prevTime, prevOpen, prevClose, prevSize, 
 					lastTime, lastOpen, lastClose, lastSize, 
-					currentTime,currentOpen,currentClose,currentSize);
+					currentTime,currentOpen,currentClose,currentSize, ruleNo);
 		}
 		
 
 	}
 	
+
 	@Override
 	public void storeRejectCandleData(String prevTime, BigDecimal prevOpen, BigDecimal prevClose, String lastTime,
-			BigDecimal lastOpen, BigDecimal lastClose,String currentTime, BigDecimal currentOpen, BigDecimal currentClose) {
+			BigDecimal lastOpen, BigDecimal lastClose,String currentTime, BigDecimal currentOpen, BigDecimal currentClose, String rule) {
 		
 		String localTime = LocalDateTime.now().toString();
 		int pOpen = prevOpen.multiply(BigDecimal.valueOf(100000)).intValue();
@@ -92,6 +100,8 @@ public class ReporterCSVImpl implements ReporterCSV {
 		int currentSize = cClose - cOpen;
 		int id = readCount(IDREJECT);
 		increaseCount(IDREJECT, id);
+		
+		String ruleNo = checkedRule(rule);
 
 		int lines = readCount(CSVLINER);
 		if (lines == 0) {
@@ -99,26 +109,26 @@ public class ReporterCSVImpl implements ReporterCSV {
 			savedDateFile(DATEFILER,localTime);
 			appendToNewFile("TRADE-REJECT",id, localTime, prevTime, prevOpen, prevClose, prevSize, 
 					lastTime, lastOpen, lastClose, lastSize, 
-					currentTime, currentOpen, currentClose, currentSize);
+					currentTime, currentOpen, currentClose, currentSize, ruleNo);
 		} else if (lines > 100) {
 			resetLines(CSVLINER);
 			savedDateFile(DATEFILER,localTime);
 			appendToNewFile("TRADE-REJECT",id, localTime, prevTime, prevOpen, prevClose, prevSize, 
 					lastTime, lastOpen, lastClose, lastSize, 
-					currentTime, currentOpen, currentClose, currentSize);
+					currentTime, currentOpen, currentClose, currentSize, ruleNo);
 		}else {
 			increaseCount(CSVLINER,lines);
 			String currentDateFile = readDateFile(DATEFILER);
 			appendToExistingFile("TRADE-REJECT",currentDateFile,id, localTime, prevTime, prevOpen, prevClose, prevSize, 
 					lastTime, lastOpen, lastClose, lastSize, 
-					currentTime, currentOpen, currentClose, currentSize);
+					currentTime, currentOpen, currentClose, currentSize, ruleNo);
 		}
 		
 	}
 
 	private void appendToNewFile(String fileName, int idF, String localTime, String prevTime, BigDecimal prevOpen, BigDecimal prevClose, int prevSize, 
 			String lastTime, BigDecimal lastOpen, BigDecimal lastClose, int lastSize, 
-			String currentTime, BigDecimal currentOpen, BigDecimal currentClose, int currentSize) {
+			String currentTime, BigDecimal currentOpen, BigDecimal currentClose, int currentSize, String ruleNo) {
 		PrintWriter printWriter = null;
 		try {
 			String time = DateUtil.formatDateToCsvFile(localTime);
@@ -153,6 +163,8 @@ public class ReporterCSVImpl implements ReporterCSV {
 			sb.append(String.valueOf(currentClose));// currentClose
 			sb.append(DELIMITER);
 			sb.append(String.valueOf(currentSize));// currentSize
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(ruleNo));// RuleNo.
 
 			printWriter.write(sb.toString());
 		} catch (IOException e) {
@@ -166,7 +178,7 @@ public class ReporterCSVImpl implements ReporterCSV {
 	private void appendToExistingFile(String fileName, String currentDateFile, int idF, String localTime, String prevTime, BigDecimal prevOpen,
 			BigDecimal prevClose, int prevSize, 
 			String lastTime, BigDecimal lastOpen, BigDecimal lastClose, int lastSize, 
-			String currentTime, BigDecimal currentOpen, BigDecimal currentClose, int currentSize) {
+			String currentTime, BigDecimal currentOpen, BigDecimal currentClose, int currentSize, String ruleNo) {
 		
 		String time = DateUtil.formatDateToCsvFile(currentDateFile);
 		FileWriter fileWriter = null;
@@ -200,6 +212,8 @@ public class ReporterCSVImpl implements ReporterCSV {
 			fileWriter.append(String.valueOf(currentClose));// currentClose
 			fileWriter.append(DELIMITER);
 			fileWriter.append(String.valueOf(currentSize));// currentSize
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(ruleNo));// RuleNo
 
 		} catch (IOException e) {
 			LOG.error("Error parsing to existing Trade file: {}", e.getMessage());
@@ -305,6 +319,18 @@ public class ReporterCSVImpl implements ReporterCSV {
 			LOG.error("Error loading to write configCSV file: {}", ce.getMessage());
 			ce.printStackTrace();
 		}		
+	}
+	
+	private String checkedRule(String rule) {
+		if(rule.equals(RULE_1)) {
+			return RULE_1;
+		}else if(rule.equals(RULE_2)) {
+			return RULE_2;
+		}else if(rule.equals(RULE_3)) {
+			return RULE_3;
+		}else {
+			return "NONE";
+		}
 	}
 
 }

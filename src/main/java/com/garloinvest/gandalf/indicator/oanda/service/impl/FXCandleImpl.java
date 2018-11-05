@@ -77,28 +77,28 @@ public class FXCandleImpl implements FXCandle {
 					System.out.println("****************BUY!!!\n");
 					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
-							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule1");
 					return true;
 			}else if(prevSize < 0) {
 				if(lastSize > -prevSize || (lastSize + currentSize) > - prevSize) { //Rule no.2
 					System.out.println("****************BUY!!!\n");
 					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
-							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule2");
 					return true;
 				}
-			}else if(lastSize < 0) {
+			}else if(lastSize < 0 && currentSize >= 0) {
 				if(currentSize > - lastSize || (prevSize + currentSize) > - lastSize) { //Rule no.3
 					System.out.println("****************BUY!!!\n");
 					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
-							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule3");
 					return true;
 				}
 			}else {
 				reporterCSV.storeRejectCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 						lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose(),
-						currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
+						currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "NONE");
 			}
 		}
 

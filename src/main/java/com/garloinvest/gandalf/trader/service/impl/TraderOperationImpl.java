@@ -20,10 +20,9 @@ public class TraderOperationImpl implements TraderOperation {
 	private OandaBuyRuleService rule;
 
 	@Override
-	@Scheduled(cron = "0/1 * * * * ?")
+	@Scheduled(cron = "0 * * * * ?")
 	public void startOp() {
-		
-		if (true) { // if(schedule.onOff())
+		if (schedule.onOff()) { 
 			if (schedule.closeTrade()) {
 				LOG.info("*******  Closing Positions  ********");
 				if (rule.isAnyOpenPosition()) {
