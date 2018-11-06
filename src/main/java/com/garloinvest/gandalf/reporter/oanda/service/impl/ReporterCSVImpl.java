@@ -25,12 +25,16 @@ public class ReporterCSVImpl implements ReporterCSV {
 
 	private static final String DELIMITER = ",";
 	private static final String NEW_LINE = "\n";
-	private static final String HEADER = "ID,LocalTime,PrevTime,PrevOpen,PrevClose,PrevSize,LastTime,LastOpen,LastClose,LastSize,CurrentTime,CurrentOpen,CurrentClose,CurrentSize,Rule";
+	private static final String HEADER_CANDLE = "ID,LocalTime,PrevTime,PrevOpen,PrevClose,PrevSize,LastTime,LastOpen,LastClose,LastSize,CurrentTime,CurrentOpen,CurrentClose,CurrentSize,Rule";
+	private static final String HEADER_PRICE = "ID,LocalTime,PriceTime,Tradeable,BUYPrice,BUYVolume,SELLPrice,SELLVolume,SPREAD";
 	private static final String CSVLINEB = "csvLines";
 	private static final String DATEFILEB = "dateFile";
+	private static final String DATEFILEPRICE = "dateFilePrice";
 	private static final String IDBUY = "idBuy";
 	private static final String IDREJECT = "idRejected";
+	private static final String IDPRICE = "idPrice";
 	private static final String CSVLINER = "csvLineReject";
+	private static final String CSVLINEPRICE = "csvLinePrice";
 	private static final String DATEFILER = "dateFileReject";
 	private static final String CONFIG_CSV_FILE = "configCSV.properties";
 	private static final String RULE_1 = "Rule1";
@@ -125,6 +129,74 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 		
 	}
+	
+	@Override
+	public void savedCurrentPrice(String instrument, LocalDateTime time, boolean tradeable, BigDecimal buy,
+			Long liquidityBuy, BigDecimal sell, Long liquiditySell) {
+		
+		String localTime = LocalDateTime.now().toString();
+		int buyP = buy.multiply(BigDecimal.valueOf(100000)).intValue();
+		int sellP = sell.multiply(BigDecimal.valueOf(100000)).intValue();
+		int spread = buyP - sellP;
+		
+		int id = readCount(IDPRICE);
+		increaseCount(IDPRICE, id);
+		int lines = readCount(CSVLINEPRICE);
+		
+		if (lines == 0) {
+			increaseCount(CSVLINEPRICE,lines);
+			savedDateFile(DATEFILEPRICE,localTime);
+			appendToNewFilePrice("TRADE-PRICE-"+instrument,id, localTime, time, tradeable, buy, liquidityBuy, sell, liquiditySell, spread);
+		} else if (lines > 100) {
+			resetLines(CSVLINEPRICE);
+			savedDateFile(DATEFILEPRICE,localTime);
+			appendToNewFilePrice("TRADE-PRICE-"+instrument,id, localTime, time, tradeable, buy, liquidityBuy, sell, liquiditySell, spread);
+		}else {
+			increaseCount(CSVLINEPRICE,lines);
+			String currentDateFile = readDateFile(DATEFILEPRICE);
+			appendToExistingFilePrice("TRADE-PRICE-"+instrument,currentDateFile,id, localTime, time, tradeable, buy, liquidityBuy, sell, liquiditySell, spread);
+		}
+		
+	}
+
+	private void appendToNewFilePrice(String fileName, int id, String localTime, LocalDateTime time, boolean tradeable,
+			BigDecimal buy, Long liquidityBuy, BigDecimal sell, Long liquiditySell, int spread) {
+		
+		PrintWriter printWriter = null;
+		try {
+			String timeTab = DateUtil.formatDateToCsvFile(localTime);
+			printWriter = new PrintWriter(new FileWriter(fileName + timeTab + ".csv"));
+			StringBuilder sb = new StringBuilder();
+			sb.append(HEADER_PRICE);
+			sb.append(NEW_LINE);
+			sb.append(String.valueOf(id)); 				// ID
+			sb.append(DELIMITER);
+			sb.append(localTime); 						// EST Time
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(time));			// Time UTC
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(tradeable));		// Tradeable
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(buy));				// Buy-Price(Ask)
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(liquidityBuy));	// Liquidity
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(sell));			// Sell-Price(Bid)
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(liquiditySell));	// Liquidity
+			sb.append(DELIMITER);
+			sb.append(String.valueOf(spread));			// Spread
+
+			printWriter.write(sb.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+			LOG.error("Error parsing a new Trade file: {}", e.getMessage());
+		} finally {
+			printWriter.close();
+		}
+		
+	}
+
 
 	private void appendToNewFile(String fileName, int idF, String localTime, String prevTime, BigDecimal prevOpen, BigDecimal prevClose, int prevSize, 
 			String lastTime, BigDecimal lastOpen, BigDecimal lastClose, int lastSize, 
@@ -134,7 +206,7 @@ public class ReporterCSVImpl implements ReporterCSV {
 			String time = DateUtil.formatDateToCsvFile(localTime);
 			printWriter = new PrintWriter(new FileWriter(fileName + time + ".csv"));
 			StringBuilder sb = new StringBuilder();
-			sb.append(HEADER);
+			sb.append(HEADER_CANDLE);
 			sb.append(NEW_LINE);
 			sb.append(String.valueOf(idF)); // ID
 			sb.append(DELIMITER);
@@ -175,6 +247,51 @@ public class ReporterCSVImpl implements ReporterCSV {
 		}
 	}
 
+	private void appendToExistingFilePrice(String fileName, String currentDateFile, int id, String localTime,
+			LocalDateTime time, boolean tradeable, BigDecimal buy, Long liquidityBuy, BigDecimal sell,
+			Long liquiditySell, int spread) {
+		
+		String timeTab = DateUtil.formatDateToCsvFile(currentDateFile);
+		FileWriter fileWriter = null;
+		
+		try {
+			fileWriter = new FileWriter(fileName + timeTab + ".csv", true);
+			fileWriter.append(NEW_LINE);
+			fileWriter.append(String.valueOf(id)); 				// ID
+			fileWriter.append(DELIMITER);
+			fileWriter.append(localTime); 						// EST Time
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(time));			// Time UTC
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(tradeable));		// Tradeable
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(buy));				// Buy-Price(Ask)
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(liquidityBuy));	// Liquidity
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(sell));			// Sell-Price(Bid)
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(liquiditySell));	// Liquidity
+			fileWriter.append(DELIMITER);
+			fileWriter.append(String.valueOf(spread));			// Spread
+
+		} catch (IOException e) {
+			LOG.error("Error parsing to existing Trade file: {}", e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (null != fileWriter) {
+				try {
+					fileWriter.flush();
+					fileWriter.close();
+				} catch (Exception e2) {
+					LOG.error("Error closing CSV file file: {}", e2.getMessage());
+					e2.printStackTrace();
+				}
+			}
+		}
+		
+	}
+	
 	private void appendToExistingFile(String fileName, String currentDateFile, int idF, String localTime, String prevTime, BigDecimal prevOpen,
 			BigDecimal prevClose, int prevSize, 
 			String lastTime, BigDecimal lastOpen, BigDecimal lastClose, int lastSize, 

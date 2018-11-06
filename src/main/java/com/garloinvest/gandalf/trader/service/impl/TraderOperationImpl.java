@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.garloinvest.gandalf.indicator.oanda.service.FXPrice;
 import com.garloinvest.gandalf.rules.oanda.service.OandaBuyRuleService;
 import com.garloinvest.gandalf.trader.service.TraderOperation;
 import com.garloinvest.gandalf.trader.service.TraderSchedule;
@@ -18,6 +19,8 @@ public class TraderOperationImpl implements TraderOperation {
 	private TraderSchedule schedule;
 	@Autowired
 	private OandaBuyRuleService rule;
+	@Autowired
+	private FXPrice price;
 
 	@Override
 	@Scheduled(cron = "0 * * * * ?")
@@ -30,9 +33,11 @@ public class TraderOperationImpl implements TraderOperation {
 				}
 			} else if (rule.isAnyOpenPosition()) {
 				// TODO: Checked for any open position, and if any run the watch-list
-			} else if (schedule.buyerSignalPerMinute()) {
+			} else if (false) { //if (schedule.buyerSignalPerMinute())
 				// TODO: Execute a place Order
 				LOG.info("*******  Executed Place BUY Order  *******");
+			}else {
+				price.getCurrentPriceAllInstruments();
 			}
 		}
 	}
