@@ -1,5 +1,6 @@
 package com.garloinvest.gandalf.indicator.oanda.service.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,14 @@ public class FXPriceImpl implements FXPrice {
             System.out.println("Sell ->"+price.getSell());
             System.out.println("LiquiditySell ->"+price.getLiquiditySell());
             System.out.println("------------------------------");
-            reporter.savedCurrentPrice(entry.getKey(),price.getTime(),price.isTradeable(),
-            		price.getBuy(),price.getLiquidityBuy(),price.getSell(),price.getLiquiditySell());
+            /*reporter.savedCurrentPrice(entry.getKey(),price.getTime(),price.isTradeable(),
+            		price.getBuy(),price.getLiquidityBuy(),price.getSell(),price.getLiquiditySell());*/
+            if(price.isTradeable()) {
+            	int buyP = price.getBuy().multiply(BigDecimal.valueOf(100000)).intValue();
+            	int sellP = price.getSell().multiply(BigDecimal.valueOf(100000)).intValue();
+            	int spread = buyP - sellP;
+            }
+            
         }
 	}
 

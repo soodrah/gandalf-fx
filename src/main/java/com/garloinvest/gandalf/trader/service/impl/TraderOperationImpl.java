@@ -23,7 +23,7 @@ public class TraderOperationImpl implements TraderOperation {
 	private FXPrice price;
 
 	@Override
-	@Scheduled(cron = "0 * * * * ?")
+	@Scheduled(cron = "0/1 * * * * ?")
 	public void startOp() {
 		if (schedule.onOff()) { 
 			if (schedule.closeTrade()) {
