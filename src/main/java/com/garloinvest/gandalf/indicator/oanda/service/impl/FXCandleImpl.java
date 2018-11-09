@@ -25,7 +25,7 @@ public class FXCandleImpl implements FXCandle {
 	private ReporterCSV reporterCSV;
 
 	@Override
-	public boolean compareLastTwoCandlestick(String instrumentName) {
+	public boolean compareLastThreeCandlestick(String instrumentName) {
 		Map<String, Map<LocalDateTime, OandaInstrumentCandlestick>> candlestickData = router
 				.readOandaInstrumentCandlestickPerMinute(instrumentName);
 
@@ -66,24 +66,27 @@ public class FXCandleImpl implements FXCandle {
 			int currentSize = cClose - cOpen;
 			if (prevSize >= 0 && lastSize >= 0 && currentSize >= 0) { //Rule no.1
 					LOG.info("****************BUY!!!\n");
-					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+					/*reporterCSV.storeBuyCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
-							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule1");
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule1");*/
+					reporterCSV.savedCurrentCandle(currentTime,currentCandle.getOpen(),currentCandle.getClose(),currentSize);
 					return true;
 			}else if(prevSize < 0) {
 				if(lastSize > -prevSize || (lastSize + currentSize) > - prevSize) { //Rule no.2
 					LOG.info("****************BUY!!!\n");
-					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+					/*reporterCSV.storeBuyCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
-							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule2");
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule2");*/
+					reporterCSV.savedCurrentCandle(currentTime,currentCandle.getOpen(),currentCandle.getClose(),currentSize);
 					return true;
 				}
 			}else if(lastSize < 0 && currentSize >= 0) {
 				if(currentSize > - lastSize || (prevSize + currentSize) > - lastSize) { //Rule no.3
 					LOG.info("****************BUY!!!\n");
-					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+					/*reporterCSV.storeBuyCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
-							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule3");
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule3");*/
+					reporterCSV.savedCurrentCandle(currentTime,currentCandle.getOpen(),currentCandle.getClose(),currentSize);
 					return true;
 				}
 			}else {

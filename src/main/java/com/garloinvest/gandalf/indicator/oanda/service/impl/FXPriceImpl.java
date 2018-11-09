@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.garloinvest.gandalf.constants.GlobalConstants;
 import com.garloinvest.gandalf.indicator.oanda.service.FXPrice;
 import com.garloinvest.gandalf.reporter.oanda.service.ReporterCSV;
 import com.garloinvest.gandalf.searcher.oanda.dto.OandaInstrumentPrice;
@@ -25,7 +26,7 @@ public class FXPriceImpl implements FXPrice {
 	private ReporterCSV reporter;
 
 	@Override
-	public void getCurrentPriceAllInstruments() {
+	public boolean getCurrentPriceAllInstruments() {
 		List<String> instruments = new ArrayList<>();
 		instruments.add("EUR_USD");
 		Map<String,OandaInstrumentPrice> bid_ask_price_map= router.readOandaInstrumentPrice(instruments);
@@ -45,9 +46,14 @@ public class FXPriceImpl implements FXPrice {
             	int buyP = price.getBuy().multiply(BigDecimal.valueOf(100000)).intValue();
             	int sellP = price.getSell().multiply(BigDecimal.valueOf(100000)).intValue();
             	int spread = buyP - sellP;
+            	if(spread <= GlobalConstants.MAX_SPREAD_EURUSD && spread >= GlobalConstants.MIN_SPREAD_EURUSD) {
+            		reporter.bookBuyOrder(entry.getKey(), price.getTime(), price.getBuy(),price.getSell(), spread);
+            		return true;
+            	}
             }
             
         }
+		return false;
 	}
 
 }

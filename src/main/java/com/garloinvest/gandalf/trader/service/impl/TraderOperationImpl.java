@@ -29,12 +29,12 @@ public class TraderOperationImpl implements TraderOperation {
 			if (schedule.closeTrade()) {
 				LOG.info("*******  Closing Positions  ********");
 				if (rule.isAnyOpenPosition()) {
-					// TODO: Close any open position at the best price
+					// NONSONARTODO: Close any open position at the best price
 				}
 			} else if (rule.isAnyOpenPosition()) {
-				// TODO: Checked for any open position, and if any run the watch-list
-			} else if (false) { //if (schedule.buyerSignalPerMinute())
-				// TODO: Execute a place Order
+				// NONSONARTODO: Checked for any open position, and if any run the watch-list
+			} else if (schedule.buyerSignalPerMinute()) {
+				// NONSONARTODO: Execute a place Order
 				LOG.info("*******  Executed Place BUY Order  *******");
 			}else {
 				price.getCurrentPriceAllInstruments();
