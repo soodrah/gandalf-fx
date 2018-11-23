@@ -5,12 +5,13 @@ import java.time.LocalDateTime;
 
 public class OandaInstrumentPrice {
 
-	private boolean tradeable;
+  private boolean tradeable;
   private LocalDateTime time;
   private BigDecimal sell; //Bid
   private Long liquiditySell;
   private BigDecimal buy; //Ask
   private Long liquidityBuy;
+  private String instrument;
 
   public OandaInstrumentPrice() {
   }
@@ -63,15 +64,17 @@ public class OandaInstrumentPrice {
       this.liquidityBuy = liquidityBuy;
   }
 
-  @Override
-  public String toString() {
-      return "OandaInstrumentPrice{" +
-              "tradeable=" + tradeable +
-              ", time=" + time +
-              ", sell=" + sell +
-              ", liquiditySell=" + liquiditySell +
-              ", buy=" + buy +
-              ", liquidityBuy=" + liquidityBuy +
-              '}';
-  }
+  public String getInstrument() {
+	return instrument;
+}
+
+public void setInstrument(String instrument) {
+	this.instrument = instrument;
+}
+
+@Override
+public String toString() {
+	return "OandaInstrumentPrice [tradeable=" + tradeable + ", time=" + time + ", sell=" + sell + ", liquiditySell="
+			+ liquiditySell + ", buy=" + buy + ", liquidityBuy=" + liquidityBuy + ", instrument=" + instrument + "]";
+}
 }

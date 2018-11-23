@@ -4,4 +4,5 @@ public interface OandaBuyRuleService {
 
 	public boolean buySignalCandlestick();
 	public boolean isAnyOpenPosition();
+	public boolean buySignalPriceSpreadRange();
 }

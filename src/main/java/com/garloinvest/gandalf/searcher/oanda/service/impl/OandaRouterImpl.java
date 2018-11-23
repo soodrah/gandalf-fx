@@ -1,6 +1,5 @@
 package com.garloinvest.gandalf.searcher.oanda.service.impl;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +39,7 @@ public class OandaRouterImpl implements OandaRouter {
     private Environment environment;
     @Autowired
     private OandaConnectionFXPractice connection;
-	
+
 	@Override
 	public Map<String, Map<LocalDateTime, OandaInstrumentCandlestick>> readOandaInstrumentCandlestickPerMinute(
 			String instrumentName) {

@@ -17,6 +17,6 @@ public class FXCandleTest {
 	
 	@Test
 	public void checkNullDataFromRouterService() {
-		fxCandle.compareLastTwoCandlestick("EUR_USD");
+		fxCandle.compareLastThreeCandlestick("EUR_USD");
 	}
 }

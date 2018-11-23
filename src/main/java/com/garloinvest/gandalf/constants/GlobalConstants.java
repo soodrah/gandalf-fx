@@ -17,5 +17,10 @@ public class GlobalConstants {
 	public static final String ACCOUNTID_FX_PRACTICE = "oanda.fxTradePractice.accountId";
 	public static final String DOMAIN_FX_PRACTICE = "oanda.fxpracticeapi.domain";
 	public static final String TOKEN_FX_PRACTICE = "oanda.fxTradePractice.token";
+	public static final int CONNECTION_MAX_PER_ROUTE = 100;
+	public static final int CONNECTION_MAX_TOTAL = 1000;
+	public static final int POOL_SIZE = 100;
+	public static final int MAX_SPREAD_EURUSD = 15;
+	public static final int MIN_SPREAD_EURUSD = 11;
 	
 }

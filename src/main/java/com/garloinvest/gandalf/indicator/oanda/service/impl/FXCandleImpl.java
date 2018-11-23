@@ -1,5 +1,6 @@
 package com.garloinvest.gandalf.indicator.oanda.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.TreeMap;
@@ -24,7 +25,7 @@ public class FXCandleImpl implements FXCandle {
 	private ReporterCSV reporterCSV;
 
 	@Override
-	public boolean compareLastTwoCandlestick(String instrumentName) {
+	public boolean compareLastThreeCandlestick(String instrumentName) {
 		Map<String, Map<LocalDateTime, OandaInstrumentCandlestick>> candlestickData = router
 				.readOandaInstrumentCandlestickPerMinute(instrumentName);
 
@@ -45,80 +46,54 @@ public class FXCandleImpl implements FXCandle {
 			OandaInstrumentCandlestick prevCandle = candleMap.get(prevTime);
 			OandaInstrumentCandlestick lastCandle = candleMap.get(lastTime);
 			OandaInstrumentCandlestick currentCandle = candleMap.get(currentTime);
-			System.out.println("****************Indicator Service:\n");
-			//TODO: Important handle null values
-			if(null != prevTime.toString()) {
-				System.out.println("****************PrevTime: "+prevTime.toString()+"\n");
-			}else {
-				System.out.println("****************PrevTime: NULL");
-				break;
-			}
-			if(null != prevCandle.getOpen().toString()) {
-				System.out.println("****************PrevCandle Open: "+prevCandle.getOpen().toString()+"\n");
-			}else {
-				System.out.println("****************PrevCandle Open: NULL");
-				break;
-			}
-			if(null != prevCandle.getClose().toString()) {
-				System.out.println("****************PrevCandle Close: "+prevCandle.getClose().toString()+"\n");
-			}else {
-				System.out.println("****************PrevCandle Close: NULL");
-				break;
-			}
-			if(null != lastTime.toString()) {
-				System.out.println("****************LastTime: "+lastTime.toString()+"\n");
-			}else {
-				System.out.println("****************LastTime: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen().toString()) {
-				System.out.println("****************LastCandle Open: "+lastCandle.getOpen().toString()+"\n");
-			}else {
-				System.out.println("****************LastCandle Open: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen().toString()) {
-				System.out.println("****************LastCandle Close: "+lastCandle.getClose().toString()+"\n");
-			}else {
-				System.out.println("****************LastCandle Close: NULL");
-				break;
-			}
-			if(null != lastTime.toString()) {
-				System.out.println("****************CurrentTime: "+currentTime.toString()+"\n");
-			}else {
-				System.out.println("****************CurrentTime: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen().toString()) {
-				System.out.println("****************CurrentCandle Open: "+currentCandle.getOpen().toString()+"\n");
-			}else {
-				System.out.println("****************CurrentCandle Open: NULL");
-				break;
-			}
-			if(null != lastCandle.getOpen().toString()) {
-				System.out.println("****************CurrentCandle Close: "+currentCandle.getClose().toString()+"\n");
-			}else {
-				System.out.println("****************CurrentCandle Close: NULL");
-				break;
-			}
-			
+
 			if (!lastCandle.isComplete()) {
+				LOG.error("Error: FXCandleImple last Candle is NOT completed");
 				break;
 			}
 
-			// Verifying if the prevCandle was up and if the lastCandle is going up respect
-			// the prevCandle
-			if (prevCandle.getOpen().compareTo(prevCandle.getClose()) < 0 && 
-					lastCandle.getOpen().compareTo(lastCandle.getClose()) <= 0) {
-					System.out.println("****************BUY!!!\n");
-					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
-							lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose(),
-							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
+			
+			//Run three set of patterns base on the Size of each Candle and its Trend
+			//This calculation its customize for EUR_USD, for other currency needs to apply different conversion
+			int pOpen = prevCandle.getOpen().multiply(BigDecimal.valueOf(100000)).intValue();	 //prevOpen
+			int pClose = prevCandle.getClose().multiply(BigDecimal.valueOf(100000)).intValue();	 //prevClose
+			int prevSize = pClose - pOpen;
+			int lOpen = lastCandle.getOpen().multiply(BigDecimal.valueOf(100000)).intValue();	 //lastOpen
+			int lClose = lastCandle.getClose().multiply(BigDecimal.valueOf(100000)).intValue();	 //lastClose
+			int lastSize = lClose - lOpen;
+			int cOpen = currentCandle.getOpen().multiply(BigDecimal.valueOf(100000)).intValue();  //currentOpen	
+			int cClose = currentCandle.getClose().multiply(BigDecimal.valueOf(100000)).intValue();//currentClose
+			int currentSize = cClose - cOpen;
+			if (prevSize >= 0 && lastSize >= 0 && currentSize >= 0) { //Rule no.1
+					LOG.info("****************BUY!!!\n");
+					/*reporterCSV.storeBuyCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule1");*/
+					reporterCSV.savedCurrentCandle(currentTime,currentCandle.getOpen(),currentCandle.getClose(),currentSize);
 					return true;
+			}else if(prevSize < 0) {
+				if(lastSize > -prevSize || (lastSize + currentSize) > - prevSize) { //Rule no.2
+					LOG.info("****************BUY!!!\n");
+					/*reporterCSV.storeBuyCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule2");*/
+					reporterCSV.savedCurrentCandle(currentTime,currentCandle.getOpen(),currentCandle.getClose(),currentSize);
+					return true;
+				}
+			}else if(lastSize < 0 && currentSize >= 0) {
+				if(currentSize > - lastSize || (prevSize + currentSize) > - lastSize) { //Rule no.3
+					LOG.info("****************BUY!!!\n");
+					/*reporterCSV.storeBuyCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+							lastTime.toString(),lastCandle.getOpen(),lastCandle.getClose(),
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "Rule3");*/
+					reporterCSV.savedCurrentCandle(currentTime,currentCandle.getOpen(),currentCandle.getClose(),currentSize);
+					return true;
+				}
 			}else {
+				LOG.info("****************NOT SIGNAL FOR BUY :(\n");
 				reporterCSV.storeRejectCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
 						lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose(),
-						currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
+						currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose(), "NONE");
 			}
 		}
 
