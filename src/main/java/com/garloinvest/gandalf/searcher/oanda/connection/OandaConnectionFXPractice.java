@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import com.garloinvest.gandalf.constants.GlobalConstants;
 import com.oanda.v20.Context;
 import com.oanda.v20.ContextBuilder;
 
@@ -18,8 +19,8 @@ public class OandaConnectionFXPractice {
 
     public Context getConnectionFXPractice() {
         LOG.info("#######   OANDA FX-Practice ~ Establishing Connection    #######");
-        return new ContextBuilder(environment.getProperty("oanda.fxpracticeapi.domain"))
-                .setToken(environment.getProperty("oanda.fxTradePractice.token"))
+        return new ContextBuilder(environment.getProperty(GlobalConstants.DOMAIN_FX_PRACTICE))
+                .setToken(environment.getProperty(GlobalConstants.TOKEN_FX_PRACTICE))
                 .setApplication("Gandalf-FX")
                 .build();
     }

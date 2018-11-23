@@ -46,12 +46,62 @@ public class FXCandleImpl implements FXCandle {
 			OandaInstrumentCandlestick lastCandle = candleMap.get(lastTime);
 			OandaInstrumentCandlestick currentCandle = candleMap.get(currentTime);
 			System.out.println("****************Indicator Service:\n");
-			System.out.println("****************PrevTime: "+prevTime.toString()+"\n");
-			System.out.println("****************PrevCandle Open: "+prevCandle.getOpen().toString()+"\n");
-			System.out.println("****************PrevCandle Close: "+prevCandle.getClose().toString()+"\n");
-			System.out.println("****************LastTime: "+lastTime.toString()+"\n");
-			System.out.println("****************LastCandle Open: "+lastCandle.getOpen().toString()+"\n");
-			System.out.println("****************LastCandle Close: "+prevCandle.getClose().toString()+"\n");
+			//TODO: Important handle null values
+			if(null != prevTime.toString()) {
+				System.out.println("****************PrevTime: "+prevTime.toString()+"\n");
+			}else {
+				System.out.println("****************PrevTime: NULL");
+				break;
+			}
+			if(null != prevCandle.getOpen().toString()) {
+				System.out.println("****************PrevCandle Open: "+prevCandle.getOpen().toString()+"\n");
+			}else {
+				System.out.println("****************PrevCandle Open: NULL");
+				break;
+			}
+			if(null != prevCandle.getClose().toString()) {
+				System.out.println("****************PrevCandle Close: "+prevCandle.getClose().toString()+"\n");
+			}else {
+				System.out.println("****************PrevCandle Close: NULL");
+				break;
+			}
+			if(null != lastTime.toString()) {
+				System.out.println("****************LastTime: "+lastTime.toString()+"\n");
+			}else {
+				System.out.println("****************LastTime: NULL");
+				break;
+			}
+			if(null != lastCandle.getOpen().toString()) {
+				System.out.println("****************LastCandle Open: "+lastCandle.getOpen().toString()+"\n");
+			}else {
+				System.out.println("****************LastCandle Open: NULL");
+				break;
+			}
+			if(null != lastCandle.getOpen().toString()) {
+				System.out.println("****************LastCandle Close: "+lastCandle.getClose().toString()+"\n");
+			}else {
+				System.out.println("****************LastCandle Close: NULL");
+				break;
+			}
+			if(null != lastTime.toString()) {
+				System.out.println("****************CurrentTime: "+currentTime.toString()+"\n");
+			}else {
+				System.out.println("****************CurrentTime: NULL");
+				break;
+			}
+			if(null != lastCandle.getOpen().toString()) {
+				System.out.println("****************CurrentCandle Open: "+currentCandle.getOpen().toString()+"\n");
+			}else {
+				System.out.println("****************CurrentCandle Open: NULL");
+				break;
+			}
+			if(null != lastCandle.getOpen().toString()) {
+				System.out.println("****************CurrentCandle Close: "+currentCandle.getClose().toString()+"\n");
+			}else {
+				System.out.println("****************CurrentCandle Close: NULL");
+				break;
+			}
+			
 			if (!lastCandle.isComplete()) {
 				break;
 			}
@@ -61,12 +111,14 @@ public class FXCandleImpl implements FXCandle {
 			if (prevCandle.getOpen().compareTo(prevCandle.getClose()) < 0 && 
 					lastCandle.getOpen().compareTo(lastCandle.getClose()) <= 0) {
 					System.out.println("****************BUY!!!\n");
-					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),
-							prevCandle.getClose(),lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose());
+					reporterCSV.savedCandleStickBUYSignal(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+							lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose(),
+							currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
 					return true;
 			}else {
-				reporterCSV.storeRejectCandleData(prevTime.toString(),prevCandle.getOpen(),
-						prevCandle.getClose(),lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose());
+				reporterCSV.storeRejectCandleData(prevTime.toString(),prevCandle.getOpen(),prevCandle.getClose(),
+						lastTime.toString(),lastCandle.getOpen(),prevCandle.getClose(),
+						currentTime.toString(),currentCandle.getOpen(),currentCandle.getClose());
 			}
 		}
 
